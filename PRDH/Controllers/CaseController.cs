@@ -24,10 +24,11 @@ namespace PRDH.Controllers
            return await _caseDatabaseContext.Cases.ToListAsync();
         }
 
-        [HttpGet("read/{caseId}")]
-        public async Task<ActionResult<CaseModel>> GetCaseById(string caseId)
+        [HttpGet("read")]
+        public async Task<ActionResult<CaseModel>> GetCaseById([FromQuery] string caseId)
         {
 
+            if(string.IsNullOrWhiteSpace(caseId)) return BadRequest(string.Empty);
             var @case = await _caseDatabaseContext.Cases.FindAsync(caseId);
             if(@case == null) return NotFound(new { message = "Case not found with the provided ID.", caseId = caseId});
 
@@ -36,7 +37,7 @@ namespace PRDH.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<CaseModel>> CreateCase(CaseModel @case)
+        public async Task<ActionResult<CaseModel>> CreateCase([FromBody]CaseModel @case)
         {
             @case.caseId = Guid.NewGuid().ToString();
             var validator = new CaseModelValidator(); 
@@ -49,8 +50,8 @@ namespace PRDH.Controllers
             return CreatedAtAction("CaseCreateSuccess", new { id = @case.caseId }, @case);
         }
 
-        [HttpPost("update/{caseId}")]
-        public async Task <IActionResult> UpdateCase( string caseId, CaseModel @case)
+        [HttpPost("update")]
+        public async Task <IActionResult> UpdateCase([FromBody] CaseModel @case)
         {
             var validator = new CaseModelValidator();
 

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PRDH.constants;
 using PRDH.models;
+using PRDH.models.requests;
 using PRDH.services;
 
 namespace PRDH.Controllers
@@ -17,17 +18,12 @@ namespace PRDH.Controllers
             _userService = userService?? throw new ArgumentNullException(nameof(_userService)); ;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetUsers([FromQuery] string orderTestType,
-            [FromQuery] string sampleCollectedStartDate,
-            [FromQuery] string sampleCollectedEndDate, 
-            [FromQuery] string createdAtStartDate, 
-            [FromQuery] string createdAtEndDate
-            )
+        [HttpPost]
+        public async Task<IActionResult> GetUsers([FromBody] GetCovidFilters covidFilters)
         // DATE time example 2024-09-27T00%3A00%3A00.0000000Z
         {
             // this worked
-            string apiUrl = PrdhContants.ENDPOINT_URL+$"?OrderTestCategory=COVID-19&OrderTestType={orderTestType}&SampleCollectedStartDate={sampleCollectedStartDate}&SampleCollectedEndDate={sampleCollectedEndDate}&CreatedAtStartDate={createdAtStartDate}&CreatedAtEndDate={createdAtEndDate}";  // Replace with actual URL
+            string apiUrl = PrdhContants.ENDPOINT_URL+$"?OrderTestCategory=COVID-19&OrderTestType={covidFilters.orderTestType}&SampleCollectedStartDate={covidFilters.sampleCollectedStartDate}&SampleCollectedEndDate={covidFilters.sampleCollectedEndDate}&CreatedAtStartDate={covidFilters.createdAtStartDate}&CreatedAtEndDate={covidFilters.createdAtEndDate}";  // Replace with actual URL
 
             var users = await _userService.GetCovid(apiUrl);
             if (users.Count() > 0)

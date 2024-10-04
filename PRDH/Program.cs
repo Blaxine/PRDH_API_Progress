@@ -4,6 +4,17 @@ using PRDH.services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+// register the angular cors to allow calls from angular local host 4200
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularApp",
+        policy => policy
+            .WithOrigins("http://localhost:4200") // Replace with your Angular app URL
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -28,6 +39,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("AllowAngularApp");
 
 app.UseHttpsRedirection();
 
