@@ -4,6 +4,8 @@ using PRDH.constants;
 using PRDH.models;
 using PRDH.models.requests;
 using PRDH.services;
+using PRDH.validators;
+using System.ComponentModel.DataAnnotations;
 
 namespace PRDH.Controllers
 {
@@ -22,6 +24,14 @@ namespace PRDH.Controllers
         public async Task<IActionResult> GetUsers([FromBody] GetCovidFilters covidFilters)
         // DATE time example 2024-09-27T00%3A00%3A00.0000000Z
         {
+
+            var validator = new GetCovidValidator(); 
+            var validationResult = await validator.ValidateAsync(covidFilters);
+            
+            if(!validationResult.IsValid) {
+            return BadRequest(validationResult);
+            }
+
             // this worked
             string apiUrl = PrdhContants.ENDPOINT_URL+$"?OrderTestCategory=COVID-19&OrderTestType={covidFilters.orderTestType}&SampleCollectedStartDate={covidFilters.sampleCollectedStartDate}&SampleCollectedEndDate={covidFilters.sampleCollectedEndDate}&CreatedAtStartDate={covidFilters.createdAtStartDate}&CreatedAtEndDate={covidFilters.createdAtEndDate}";  // Replace with actual URL
 
