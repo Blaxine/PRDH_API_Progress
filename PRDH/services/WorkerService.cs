@@ -13,10 +13,13 @@ namespace PRDH.services
 
         private readonly HttpClient _httpClient = new HttpClient();
         private readonly CaseDataBaseContext _caseDatabaseContext;
-        public WorkerService(HttpClient httpClient, CaseDataBaseContext csdb)
+        private readonly ILogger<WorkerService> _logger;
+        public WorkerService(HttpClient httpClient, CaseDataBaseContext csdb, ILogger<WorkerService> logger)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _caseDatabaseContext = csdb ?? throw new ArgumentNullException(nameof(csdb));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
         }
 
         public async Task<List<LaboratoryTestsModel>?> GetCovid(string apiUrl)
@@ -30,24 +33,28 @@ namespace PRDH.services
 
                 // Read and deserialize the response body
                 string responseBody = await response.Content.ReadAsStringAsync();
-                List<LaboratoryTestsModel> results = JsonConvert.DeserializeObject<List<LaboratoryTestsModel>>(responseBody);
+                if (string.IsNullOrEmpty(responseBody))
+                {
+                    return default;
+                }
+                List<LaboratoryTestsModel> results = JsonConvert.DeserializeObject<List<LaboratoryTestsModel>>(responseBody)!;
 
                 return results;
             }
             catch (HttpRequestException httpEx)
             {
-                Console.WriteLine($"Request error: {httpEx.Message}");
+               _logger.LogCritical($"Request error: {httpEx.Message}");
             }
             catch (JsonSerializationException jsonEx)
             {
-                Console.WriteLine($"JSON deserialization error: {jsonEx.Message}");
+                _logger.LogCritical($"JSON deserialization error: {jsonEx.Message}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
+                _logger.LogCritical($"An error occurred: {ex.Message}");
             }
 
-            return null;
+            return default;
 
         }
 

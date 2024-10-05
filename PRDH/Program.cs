@@ -1,17 +1,18 @@
 using Microsoft.EntityFrameworkCore;// nugget entity frameworkCote.inMemory
+using Microsoft.Extensions.Configuration;
+using PRDH.constants;
 using PRDH.DataBase;
 using PRDH.mapers;
 using PRDH.services;
 
 var builder = WebApplication.CreateBuilder(args);
-
-
+var angularHost = builder.Environment.IsDevelopment() ? builder.Configuration[PrdhContants.ALLOWED_ORIGIN.LOCAL_HOST] : builder.Configuration[PrdhContants.ALLOWED_ORIGIN.PRODUCTION_HOST];
 // register the angular cors to allow calls from angular local host 4200
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngularApp",
+    options.AddPolicy(PrdhContants.CORS_POLICY,
         policy => policy
-            .WithOrigins("http://localhost:4200") // Replace with your Angular app URL
+            .WithOrigins(angularHost)
             .AllowAnyHeader()
             .AllowAnyMethod());
 });
@@ -24,7 +25,7 @@ builder.Services.AddAutoMapper(typeof(CovidMinimalToCasesMapper));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
-
+builder.Services.AddLogging();
 //Register the worker service to be intanciated
 builder.Services.AddScoped<WorkerService>();
 
@@ -42,7 +43,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("AllowAngularApp");
+app.UseCors(PrdhContants.CORS_POLICY);
 
 app.UseHttpsRedirection();
 
