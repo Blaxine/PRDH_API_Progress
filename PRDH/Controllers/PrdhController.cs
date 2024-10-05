@@ -6,7 +6,10 @@ using PRDH.models;
 using PRDH.models.requests;
 using PRDH.services;
 using PRDH.validators;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Intrinsics.X86;
+using System.Security.Cryptography;
 
 namespace PRDH.Controllers
 {
@@ -35,8 +38,8 @@ namespace PRDH.Controllers
             }
 
             // this worked
-            string apiUrl = PrdhContants.ENDPOINT_URL+$"?OrderTestCategory=COVID-19&OrderTestType={covidFilters.orderTestType}&SampleCollectedStartDate={covidFilters.sampleCollectedStartDate}&SampleCollectedEndDate={covidFilters.sampleCollectedEndDate}&CreatedAtStartDate={covidFilters.createdAtStartDate}&CreatedAtEndDate={covidFilters.createdAtEndDate}";  // Replace with actual URL
-
+            string apiUrl = PrdhContants.ENDPOINT_URL+$"?" + BuildQueryStrint(covidFilters);  // Replace with actual URL
+           
             var users = await _userService.GetCovid(apiUrl);
 
             if (users.Count() > 0)
@@ -66,6 +69,27 @@ namespace PRDH.Controllers
 
             }
             return Ok(users);  // Return the data as JSON
+        }
+
+        private static string BuildQueryStrint(GetCovidFilters payload)
+        {
+            string query = "";
+
+            foreach (var property in payload.GetType().GetProperties())
+            {
+                var key = property.Name;
+                var value = property.GetValue(payload);
+                string filterProperty = string.Concat(key[0].ToString().ToUpper(), key.AsSpan(1));
+            if (string.IsNullOrEmpty(query))
+                {
+                    query += $"{filterProperty}={value}";
+                }
+                else
+                {
+                    query += $"&{filterProperty}={value}";
+                }
+            }
+            return query;
         }
     }
 }
