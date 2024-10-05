@@ -18,11 +18,11 @@ namespace PRDH.Controllers
     public class PrdhController : ControllerBase
     {
         private readonly WorkerService _userService;
-        private readonly IMapper _mapper;
+        private readonly IMapper _covidToCaseMapper;
         public PrdhController(WorkerService userService, IMapper mapper)
         {
             _userService = userService?? throw new ArgumentNullException(nameof(_userService));
-            _mapper = mapper;
+            _covidToCaseMapper = mapper;
         }
 
         [HttpPost]
@@ -41,15 +41,16 @@ namespace PRDH.Controllers
             string apiUrl = PrdhContants.ENDPOINT_URL+$"?" + BuildQueryStrint(covidFilters);  // Replace with actual URL
            
             var users = await _userService.GetCovid(apiUrl);
-
+            int positiveCaes = 0;
             if (users.Count() > 0)
             {
                 users.ForEach(async user =>
                 {
-                    if (user != null && user.orderTestResult.ToLower() == "positive" && _mapper != null)
+                    if (user != null && user.orderTestResult.ToLower() == "positive" && _covidToCaseMapper != null)
                     {
-                        var positiveCase = _mapper.Map<CaseModel>(user);
-                        await _userService.StoreCaseDate(positiveCase);                        
+                        var positiveCase = _covidToCaseMapper.Map<CaseModel>(user);
+                        await _userService.StoreCaseDate(positiveCase);
+                        positiveCaes++;
                     };
                 });
 
@@ -59,12 +60,14 @@ namespace PRDH.Controllers
                                        {
                                            PatientId = group.Key,
                                            Users = group.ToList(),
-                                           numberOfPositiveCases = group.Count(x=>x.orderTestResult.ToString() == "Positive")
                                        });
-                
-                
 
-                return Ok(groupOrders);
+                return Ok(new
+                {
+                    results = groupOrders,
+                    totalResults=users.Count(),
+                    positiveResults = positiveCaes
+                });
 
 
             }

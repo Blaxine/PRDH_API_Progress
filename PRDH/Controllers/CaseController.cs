@@ -23,7 +23,13 @@ namespace PRDH.Controllers
         [HttpGet("list")]
         public async Task<ActionResult<IEnumerable<CaseModel>>> ListCases()
         {
-           return await _caseDatabaseContext.Cases.ToListAsync();
+            var results = await _caseDatabaseContext.Cases.ToListAsync();
+            return Ok(
+                new
+                {
+                    cases = results,
+                    totalCases = results.Count(),
+                });
         }
 
         [HttpGet("read")]
