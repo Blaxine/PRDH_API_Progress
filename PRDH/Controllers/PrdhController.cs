@@ -49,7 +49,7 @@ namespace PRDH.Controllers
 
             if (userCount > 0)
             {
-                var groupOrders = users.GroupBy(value => value?.patientId.ToString())
+                var groupOrders = users.GroupBy(value => value?.PatientId.ToString())
                                        .Select(group => new
                                        {
                                            PatientId = group.Key,
@@ -60,7 +60,7 @@ namespace PRDH.Controllers
                 foreach (var userGroup in groupOrders)
                 {
                     // Find the earliest start date for the current group
-                    var earliestStartDate = userGroup.Test.FirstOrDefault(p => p.orderTestResult.Eq(PrdhContants.POSITIVE));
+                    var earliestStartDate = userGroup.Test.FirstOrDefault(p => p.OrderTestResult.Eq(PrdhContants.POSITIVE));
                     if (earliestStartDate == null) continue;
                         var positiveCase = _covidToCaseMapper.Map<CaseModel>(earliestStartDate);
                         await _userService.StoreCaseDate(positiveCase);

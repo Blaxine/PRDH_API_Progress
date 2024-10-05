@@ -7,17 +7,17 @@ namespace PRDH.models
     {
         
         [Key]
-        public string caseId { get; set; } = Guid.NewGuid().ToString();
-        public string caseCategory { get; set; }
-        public string caseType { get; set; }
-        public string caseClassification { get; set; }
-        public string patientId { get; set; }
-        public string patientAgeRange { get; set; }
-        public string patientSex { get; set; }
-        public string patientPhysicalCity { get; set; }
-        public string patientPhysicalRegion { get; set; }
-        public string earliestPositiveRankingTestSampleCollectedDate { get; set; }
-        public string earliestPositiveDiagnosticTestSampleCollectedDate { get; set; }
-        public string caseCreatedAt { get; set; }
+        public string CaseId { get; set; } = Guid.NewGuid().ToString();
+        public string CaseCategory { get; set; }
+        public string CaseType { get; set; }
+        public string CaseClassification { get; set; }
+        public string PatientId { get; set; }
+        public string PatientAgeRange { get; set; }
+        public string PatientSex { get; set; }
+        public string PatientPhysicalCity { get; set; }
+        public string PatientPhysicalRegion { get; set; }
+        public string EarliestPositiveRankingTestSampleCollectedDate { get; set; }
+        public string EarliestPositiveDiagnosticTestSampleCollectedDate { get; set; }
+        public string CaseCreatedAt { get; set; }
     } 
 }
