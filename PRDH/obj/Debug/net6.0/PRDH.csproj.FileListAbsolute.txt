@@ -38,3 +38,4 @@ C:\Users\User\Documents\prdh_code\PRDH\PRDH\bin\Debug\net6.0\Microsoft.EntityFra
 C:\Users\User\Documents\prdh_code\PRDH\PRDH\bin\Debug\net6.0\Microsoft.Extensions.Caching.Memory.dll
 C:\Users\User\Documents\prdh_code\PRDH\PRDH\bin\Debug\net6.0\Microsoft.Extensions.DependencyInjection.dll
 C:\Users\User\Documents\prdh_code\PRDH\PRDH\bin\Debug\net6.0\System.Diagnostics.DiagnosticSource.dll
+C:\Users\User\Documents\prdh_code\PRDH\PRDH\bin\Debug\net6.0\AutoMapper.dll

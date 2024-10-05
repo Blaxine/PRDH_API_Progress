@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using PRDH.DataBase;
 using PRDH.models;
+using PRDH.services;
 using PRDH.validators;
 
 namespace PRDH.Controllers
@@ -11,11 +12,12 @@ namespace PRDH.Controllers
     public class CaseController : ControllerBase
 
     {
-        private readonly CaseDataBaseContext _caseDatabaseContext; 
-
-        public CaseController(CaseDataBaseContext caseDatabaseContext)
+        private readonly CaseDataBaseContext _caseDatabaseContext;
+        private readonly WorkerService _workerService ; 
+        public CaseController(CaseDataBaseContext caseDatabaseContext, WorkerService workerService)
         {
             _caseDatabaseContext = caseDatabaseContext?? throw new ArgumentNullException(nameof(_caseDatabaseContext));
+            _workerService = workerService ?? throw new ArgumentNullException(nameof(workerService));
         }
 
         [HttpGet("list")]
@@ -36,18 +38,18 @@ namespace PRDH.Controllers
 
         }
 
-        [HttpPost]
+        [HttpPost("insert")]
         public async Task<ActionResult<CaseModel>> CreateCase([FromBody]CaseModel @case)
         {
-            @case.caseId = Guid.NewGuid().ToString();
-            var validator = new CaseModelValidator(); 
-            var validationResult = await validator.ValidateAsync(@case);
-            if (!validationResult.IsValid) return BadRequest(validationResult.Errors);
+            var validator = new InsertCaseValidator();
 
-            _caseDatabaseContext.Add(@case); 
-            await _caseDatabaseContext.SaveChangesAsync();
-
-            return CreatedAtAction("CaseCreateSuccess", new { id = @case.caseId }, @case);
+            var caseClosed = _workerService.StoreCaseDate(@case);
+            return Ok(new
+            {
+                success = true,
+                message = "Item created successfully!",
+                data = caseClosed,
+            });
         }
 
         [HttpPost("update")]

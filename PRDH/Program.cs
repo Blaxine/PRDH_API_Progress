@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;// nugget entity frameworkCote.inMemory
 using PRDH.DataBase;
+using PRDH.mapers;
 using PRDH.services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,7 @@ builder.Services.AddCors(options =>
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddAutoMapper(typeof(CovidMinimalToCasesMapper));
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

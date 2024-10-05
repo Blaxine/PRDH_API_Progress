@@ -1,5 +1,7 @@
-﻿using Microsoft.OpenApi.Any;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Any;
 using Newtonsoft.Json;
+using PRDH.DataBase;
 using PRDH.models;
 using PRDH.validators;
 using System.Text.RegularExpressions;
@@ -10,9 +12,11 @@ namespace PRDH.services
     {
 
         private readonly HttpClient _httpClient = new HttpClient();
-        public WorkerService(HttpClient httpClient)
+        private readonly CaseDataBaseContext _caseDatabaseContext;
+        public WorkerService(HttpClient httpClient, CaseDataBaseContext csdb)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _caseDatabaseContext = csdb ?? throw new ArgumentNullException(nameof(csdb));
         }
 
         public async Task<List<LaboratoryTestsModel>?> GetCovid(string apiUrl)
@@ -32,22 +36,26 @@ namespace PRDH.services
             }
             catch (HttpRequestException httpEx)
             {
-                // Log the HTTP request error
                 Console.WriteLine($"Request error: {httpEx.Message}");
             }
             catch (JsonSerializationException jsonEx)
             {
-                // Log the deserialization error
                 Console.WriteLine($"JSON deserialization error: {jsonEx.Message}");
             }
             catch (Exception ex)
             {
-                // General exception handler for other unexpected errors
                 Console.WriteLine($"An error occurred: {ex.Message}");
             }
 
-            return null; // Return null or handle it appropriately
+            return null;
 
         }
+
+        public async Task<CaseModel> StoreCaseDate(CaseModel @case)
+        {
+            _caseDatabaseContext.Add(@case);
+            await _caseDatabaseContext.SaveChangesAsync().ConfigureAwait(false);
+            return @case;
+        } 
     }
 }

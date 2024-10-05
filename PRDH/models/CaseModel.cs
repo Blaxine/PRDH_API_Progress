@@ -1,11 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
 
 namespace PRDH.models
 {
     public class CaseModel
     {
+        
         [Key]
-        public string caseId { get; set; }
+        public string caseId { get; set; } = Guid.NewGuid().ToString();
         public string caseCategory { get; set; }
         public string caseType { get; set; }
         public string caseClassification { get; set; }
