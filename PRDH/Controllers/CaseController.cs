@@ -49,7 +49,7 @@ namespace PRDH.Controllers
         {
             var validator = new InsertCaseValidator();
 
-            var caseClosed = _workerService.StoreCaseDate(@case);
+            var caseClosed = _workerService.StoreCaseDate(@case,0);
             return Ok(new
             {
                 success = true,

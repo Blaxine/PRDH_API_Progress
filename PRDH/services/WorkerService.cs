@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Any;
 using Newtonsoft.Json;
 using PRDH.DataBase;
@@ -32,18 +33,15 @@ namespace PRDH.services
                 response.EnsureSuccessStatusCode();
 
                 // Read and deserialize the response body
-                string responseBody = await response.Content.ReadAsStringAsync();
-                if (string.IsNullOrEmpty(responseBody))
-                {
-                    return default;
-                }
+                string responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+              
                 List<LaboratoryTestsModel> results = JsonConvert.DeserializeObject<List<LaboratoryTestsModel>>(responseBody)!;
 
                 return results;
             }
             catch (HttpRequestException httpEx)
             {
-               _logger.LogCritical($"Request error: {httpEx.Message}");
+                _logger.LogCritical($"Request error: {httpEx.Message}");
             }
             catch (JsonSerializationException jsonEx)
             {
@@ -58,12 +56,23 @@ namespace PRDH.services
 
         }
 
-        public async Task<CaseModel> StoreCaseDate(CaseModel @case)
+        public async Task<CaseModel> StoreCaseDate(CaseModel @case,int orderTotal)
         {
+            @case.OrderCounts = orderTotal;
+            @case.CaseId  = Guid.NewGuid().ToString();
             _caseDatabaseContext.Add(@case);
             await _caseDatabaseContext.SaveChangesAsync().ConfigureAwait(false);
             return @case;
-        } 
+        }
+
+        public async Task<ActionResult<IEnumerable<CaseModel>>> ListCases()
+        {
+            var results = await _caseDatabaseContext.Cases.ToListAsync().ConfigureAwait(false) ;
+            if (results != null && results.Count()>0)  return results;
+            return default!;
+            
+        }
     }
+   
 }
 

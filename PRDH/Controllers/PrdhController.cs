@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Any;
 using PRDH.constants;
+using PRDH.DataBase;
 using PRDH.Extensions;
+using PRDH.mapers;
 using PRDH.models;
 using PRDH.models.requests;
 using PRDH.services;
@@ -46,7 +48,7 @@ namespace PRDH.Controllers
             var users = await _userService.GetCovid(apiUrl);
             int positiveCaes = 0;
             int userCount = users.Count();
-
+            List<CaseModel> positiveResults = new List<CaseModel>();
             if (userCount > 0)
             {
                 var groupOrders = users.GroupBy(value => value?.PatientId.ToString())
@@ -54,7 +56,8 @@ namespace PRDH.Controllers
                                        {
                                            PatientId = group.Key,
                                            Test = group.ToList(),
-                                       });
+                                           GroupTotal = group.ToList().Count()
+                                       }) ;
 
 
                 foreach (var userGroup in groupOrders)
@@ -62,20 +65,26 @@ namespace PRDH.Controllers
                     // Find the earliest start date for the current group
                     var earliestStartDate = userGroup.Test.FirstOrDefault(p => p.OrderTestResult.Eq(PrdhContants.POSITIVE));
                     if (earliestStartDate == null) continue;
-                        var positiveCase = _covidToCaseMapper.Map<CaseModel>(earliestStartDate);
-                        await _userService.StoreCaseDate(positiveCase);
-                        positiveCaes++;
-                    
+
+                    var positiveCase = _covidToCaseMapper.Map<CaseModel>(earliestStartDate);
+                    await _userService.StoreCaseDate(positiveCase, userGroup.GroupTotal);
+                    positiveResults.Add(positiveCase);
+                    positiveCaes++;
                 }
+
                 return Ok(new
                 {
-                    results = groupOrders,
+                    results = positiveResults,
                     totalResults = userCount,
                     positiveResults = positiveCaes
                 });
             }
 
-            return default;
+            return Ok(new
+            {
+                count = positiveCaes,
+                totalResults = userCount
+            });
            
         }
 

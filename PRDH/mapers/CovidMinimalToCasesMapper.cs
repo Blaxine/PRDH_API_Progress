@@ -19,6 +19,7 @@ namespace PRDH.mapers
                 .ForMember(dest => dest.EarliestPositiveRankingTestSampleCollectedDate, opt => opt.MapFrom(src => src.ResultReportDate))
                 .ForMember(dest => dest.EarliestPositiveDiagnosticTestSampleCollectedDate, opt => opt.MapFrom(src => src.SampleCollectedDate))
                 .ForMember(dest => dest.CaseCreatedAt, opt => opt.MapFrom(src => src.OrderTestCreatedAt));
+
         }
     }
 }

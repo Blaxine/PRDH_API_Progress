@@ -7,7 +7,7 @@ namespace PRDH.models
     {
         
         [Key]
-        public string CaseId { get; set; } = Guid.NewGuid().ToString();
+        public string CaseId { get; set; }
         public string CaseCategory { get; set; }
         public string CaseType { get; set; }
         public string CaseClassification { get; set; }
@@ -19,5 +19,6 @@ namespace PRDH.models
         public string EarliestPositiveRankingTestSampleCollectedDate { get; set; }
         public string EarliestPositiveDiagnosticTestSampleCollectedDate { get; set; }
         public string CaseCreatedAt { get; set; }
+        public int? OrderCounts { get; set; }
     } 
 }
